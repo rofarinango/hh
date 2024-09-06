@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from decouple import config
+from django.http import JsonResponse
 from googleapiclient.discovery import build
 
 
@@ -7,7 +8,7 @@ api_key = config('API_KEY')
 channel_id = config('CHANNEL_ID')
 youtube = build('youtube', 'v3', developerKey=api_key)
 def home(request):
-    # Get image thumnail of channel
+    # Get banner image of channel
 
     channel_response = youtube.channels().list(part='brandingSettings', id=channel_id).execute()
     print(channel_response)
@@ -61,9 +62,31 @@ def home(request):
     return render(
         request,
         'home.html',
-        {'videos': videos, 'channel_settings': channel_settings},
+        {'video': videos[0], 'channel_settings': channel_settings},
     )
 
+def get_episodes_from_playlist(playlist_id):
+    episodes = []
+    next_page_token = None
 
-def get_videos():
-    pass
+    while True:
+        playlist_items = youtube.playlistItems().list(
+            part="snippet",
+            playlistId=playlist_id,
+            maxResults=5,
+            pageToken=next_page_token
+        ).execute()
+
+        for item in playlist_items['items']:
+            episode = {
+                'title': item['snippet']['title'],
+                'videoId': item['snippet']['resourceId']['videoId'],
+                'description': item['snippet']['description'],
+                'thumbnail': item['snippet']['thumbnails']['default']['url'],
+            }
+            episodes.append(episode)
+        next_page_token = playlist_items.get('nextPageToken')
+        if not next_page_token:
+            break
+
+    return episodes

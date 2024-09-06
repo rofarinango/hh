@@ -50,6 +50,7 @@
 
 .btn-player:hover {
     cursor: pointer;
+    opacity: 0.75;
 }
 
 .btn-add-list {
@@ -67,6 +68,7 @@
 
 .btn-add-list:hover {
     cursor: pointer;
+    border-color: #ffffff;
 }
 
 .btn-dropdown {
@@ -84,4 +86,9 @@
 
 .btn-dropdown:hover {
     cursor: pointer;
+    border-color: #ffffff;
+}
+
+.modal-content {
+    background: #141414 !important;
 }
