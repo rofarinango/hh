@@ -1,26 +1,78 @@
+from collections import OrderedDict
+
 from django.shortcuts import render
 from decouple import config
 from django.http import JsonResponse
 from googleapiclient.discovery import build
+import json
+import re
 
 
 api_key = config('API_KEY')
 channel_id = config('CHANNEL_ID')
 youtube = build('youtube', 'v3', developerKey=api_key)
+
+season_mapping = {
+    'Primera': 1,
+    'Segunda': 2,
+    'Tercera': 3,
+    'Cuarta': 4,
+    'Quinta': 5,
+    'Sexta': 6,
+    'Séptima': 7,
+    'Octava': 8
+}
+
 def home(request):
     # Get banner image of channel
 
     channel_response = youtube.channels().list(part='brandingSettings', id=channel_id).execute()
-    print(channel_response)
     channel_settings = {
         'title': channel_response['items'][0]['brandingSettings']['channel']['title'],
         'banner': channel_response['items'][0]['brandingSettings']['image']['bannerExternalUrl'],
     }
 
-    print(channel_settings)
-    playlist_ids = []
+    formatted_seasons = get_seasons_titles()
+    seasons = {}
+    first_key = next(iter(formatted_seasons))
+    first_value = formatted_seasons[first_key]
+
+    # Construct seasons json, each item key represents one season, each value will contain all the episodes for that season.
+    for key, value in formatted_seasons.items():
+        episodes = get_episodes_from_playlist(key)
+
+        # Collect all episodes for the current season
+        seasons[value] = {
+            'episodes': [
+                {
+                    'title': episode['title'],
+                    'videoId': episode['videoId'],
+                }
+                for episode in episodes
+            ]
+        }
+
+    first_season_key = next(iter(seasons))
+    seasons.pop(first_season_key)
+    second_season_key = next(iter(seasons))
+
+    print(seasons)
+
+    return render(
+        request,
+        'home.html',
+        {
+            'seasons': seasons,
+            'channel_settings': channel_settings,
+            'second_season_title': second_season_key,
+        },
+    )
+
+
+def get_seasons_titles():
+    playlist_ids = {}
     playlist_response = youtube.playlists().list(
-        part="id",
+        part="snippet,id",
         channelId=channel_id,
         maxResults=25
     ).execute()
@@ -29,41 +81,14 @@ def home(request):
     if playlist_response['items']:
         # Get the playlists ids
         for playlist in playlist_response['items']:
-            playlist_id = playlist['id']
-            playlist_ids.append(playlist_id)
+            if 'temporada' in playlist['snippet']['title'].lower():
+                playlist_id = playlist['id']
+                playlist_ids[playlist_id] = playlist['snippet']['title']
 
-    print(playlist_ids)
-    videos = []
-    next_page_token = None
+    sorted_seasons = dict(sorted(playlist_ids.items(), key=lambda item: extract_season_number(item[1])))
+    formatted_seasons = {key: format_title(value) for key, value in sorted_seasons.items()}
 
-    while True:
-        # Call the playlistItems.list method to get videos
-        playlist_items = youtube.playlistItems().list(
-            part="snippet",
-            playlistId=playlist_ids[0],
-            pageToken=next_page_token
-        ).execute()
-
-        # Extract video details from the response
-        for item in playlist_items['items']:
-            video = {
-                'title': item['snippet']['title'],
-                'videoId': item['snippet']['resourceId']['videoId'],
-                'description': item['snippet']['description'],
-
-            }
-            videos.append(video)
-        next_page_token = playlist_items.get('nextPageToken')
-
-        # If no more pages are left, break the loop
-        if not next_page_token:
-            break
-
-    return render(
-        request,
-        'home.html',
-        {'video': videos[0], 'channel_settings': channel_settings},
-    )
+    return formatted_seasons
 
 def get_episodes_from_playlist(playlist_id):
     episodes = []
@@ -78,11 +103,11 @@ def get_episodes_from_playlist(playlist_id):
         ).execute()
 
         for item in playlist_items['items']:
+
             episode = {
                 'title': item['snippet']['title'],
                 'videoId': item['snippet']['resourceId']['videoId'],
                 'description': item['snippet']['description'],
-                'thumbnail': item['snippet']['thumbnails']['default']['url'],
             }
             episodes.append(episode)
         next_page_token = playlist_items.get('nextPageToken')
@@ -90,3 +115,20 @@ def get_episodes_from_playlist(playlist_id):
             break
 
     return episodes
+
+
+# Function to extract the season number from the title
+def extract_season_number(title):
+    for season_name, number in season_mapping.items():
+        if season_name in title:
+            return number
+    return 0
+
+# Function to format the title
+def format_title(title):
+    # Remove the "- Hablando Huevadas" part
+    cleaned_title = re.sub(r' - Hablando Huevadas$', '', title)
+    # Extract the season number
+    season_number = extract_season_number(cleaned_title)
+    # Format the title as "Temporada X"
+    return f'Temporada {season_number}'

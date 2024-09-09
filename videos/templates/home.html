@@ -52,28 +52,43 @@
               </div>
               <div class="modal-body">
                   <div class="container">
-                      <div class="row embed-responsive" style="margin-right: -40px; margin-left: -40px; margin-top: -30px;">
+                    <div class="row embed-responsive" style="margin-right: -40px; margin-left: -40px; margin-top: -30px;">
                           <div id="player" class="embed-responsive-item"></div>
                       </div>
-
-
-                      <div class="row">
+                    <div class="row">
                           <div class="col-8 d-flex align-items-center">
                               <h5 class="mb-0">Episodios</h5>
                           </div>
                           <div class="col-4 text-end pe-0">
                               <div class="dropdown">
-                      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                        Season 2
-                      </button>
-                      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                        <li><a class="dropdown-item" href="#">Season 3</a></li>
-                        <li><a class="dropdown-item" href="#">Season 4</a></li>
-                        <li><a class="dropdown-item" href="#">Season 5</a></li>
-                      </ul>
-                  </div>
+                                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                      {{ second_season_title }}
+                                  </button>
+                                  <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    {% for season_title, season_data in seasons.items %}
+                                        <li><a class="dropdown-item" href="#" data-season="{{ season_title }}" data-title="{{ season_title }}">{{ season_title }}</a></li>
+                                    {% endfor %}
+                                  </ul>
+                              </div>
                           </div>
                       </div>
+
+                  <div class="row mt-4">
+                            <ul id="episodeList" class="list-group">
+                                {% for season_title, season_data in seasons.items %}
+                                    <li class="list-group-item episode-item" data-season="{{ season_title }}" style="display: block;">
+                                        {% for episode in season_data.episodes %}
+                                            <div>
+                                                <span>{{ forloop.counter }}</span>
+                                                <p>{{ episode.title }}</p>
+                                                <span class="video-id" data-videoid="{{ episode.videoId }}" style="display:none">{{ episode.videoId }}</span>
+                                            </div>
+                                        {% endfor %}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
                   </div>
               </div>
               <div class="modal-footer" style="border-top-color: black;">
@@ -109,10 +124,13 @@
             // Async function to create the YouTube player
             async function createPlayer() {
                 await loadYouTubeAPI();
+                if (player) {
+                    player.destroy();  // Ensure any existing player is destroyed before creating a new one
+                }
                 player = new YT.Player('player', {
                     height: '315',
                     width: '100%',
-                    videoId: '{{ video.videoId }}',
+                    videoId: '6dymbvE_EYs',
                     playerVars: {
                         'playsinline': 1,
                         'autoplay': 1,
@@ -145,6 +163,33 @@
             document.addEventListener('DOMContentLoaded', function() {
                 loadYouTubeAPI();  // Load the YouTube API on page load
             });
+
+            // Update the button text when a dropdown item is clicked
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const button = document.getElementById('dropdownMenuButton1');
+                button.textContent = this.getAttribute('data-title');
+            });
+        });
+
+         // Show episodes for selected season
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const selectedSeason = this.getAttribute('data-season');
+                const button = document.getElementById('dropdownMenuButton1');
+                button.textContent = selectedSeason;
+
+                // Hide all episode lists
+                document.querySelectorAll('.episode-item').forEach(el => el.style.display = 'none');
+
+                // Show the episode list for the selected season
+                document.querySelector(`.episode-item[data-season="${selectedSeason}"]`).style.display = 'block';
+
+                // Load the first video for the selected season
+                const firstVideoId = document.querySelector(`.episode-item[data-season="${selectedSeason}"] .video-id`).textContent.trim();
+                //createPlayer(firstVideoId);
+            });
+        });
         </script>
 
 {% endblock %}
