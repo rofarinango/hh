@@ -64,6 +64,7 @@ def home(request):
             'seasons': seasons,
             'channel_settings': channel_settings,
             'second_season_title': second_season_key,
+            'default_season_title': 'Temporada 2',
         },
     )
 
