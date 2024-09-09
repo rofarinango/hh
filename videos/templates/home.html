@@ -45,14 +45,18 @@
         <div class="modal fade" id="episodesModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
           <div class="modal-dialog">
             <div class="modal-content">
-              <div class="modal-header">
+              <div class="modal-header" style="border-bottom-color: black;">
                 <h5 class="modal-title" id="staticBackdropLabel">{{ channel_settings.title}}</h5>
 
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                  <div id="player"></div>
                   <div class="container">
+                      <div class="row embed-responsive" style="margin-right: -40px; margin-left: -40px; margin-top: -30px;">
+                          <div id="player" class="embed-responsive-item"></div>
+                      </div>
+
+
                       <div class="row">
                           <div class="col-8 d-flex align-items-center">
                               <h5 class="mb-0">Episodios</h5>
@@ -72,7 +76,7 @@
                       </div>
                   </div>
               </div>
-              <div class="modal-footer">
+              <div class="modal-footer" style="border-top-color: black;">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary">Understood</button>
               </div>
