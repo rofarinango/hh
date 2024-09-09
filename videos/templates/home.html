@@ -76,7 +76,7 @@
                   <div class="row mt-4">
                             <ul id="episodeList" class="list-group">
                                 {% for season_title, season_data in seasons.items %}
-                                    <li class="list-group-item episode-item" data-season="{{ season_title }}" style="display: block;">
+                                    <li class="list-group-item episode-item" data-season="{{ season_title }}" style="display: none;">
                                         {% for episode in season_data.episodes %}
                                             <div>
                                                 <span>{{ forloop.counter }}</span>

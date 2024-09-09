@@ -56,7 +56,6 @@ def home(request):
     seasons.pop(first_season_key)
     second_season_key = next(iter(seasons))
 
-    print(seasons)
 
     return render(
         request,
@@ -114,7 +113,7 @@ def get_episodes_from_playlist(playlist_id):
         if not next_page_token:
             break
 
-    return episodes
+    return extract_titles(episodes)
 
 
 # Function to extract the season number from the title
@@ -132,3 +131,18 @@ def format_title(title):
     season_number = extract_season_number(cleaned_title)
     # Format the title as "Temporada X"
     return f'Temporada {season_number}'
+
+def extract_titles(titles):
+    modified_titles = []
+    for title in titles:
+        # Find all bracketed sections
+        brackets = re.findall(r'\[(.*?)\]', title['title'])
+        # Only include titles with brackets
+        if brackets:
+            # Join them with ' & ' if there are multiple, otherwise just take the single item
+            new_title = ' & '.join(brackets)
+            modified_titles.append({
+                'title': new_title,
+                'videoId': title['videoId'],
+            })
+    return modified_titles
