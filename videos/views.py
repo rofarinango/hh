@@ -2,9 +2,7 @@ from collections import OrderedDict
 
 from django.shortcuts import render
 from decouple import config
-from django.http import JsonResponse
 from googleapiclient.discovery import build
-import json
 import re
 
 
@@ -47,6 +45,7 @@ def home(request):
                 {
                     'title': episode['title'],
                     'videoId': episode['videoId'],
+                    'thumbnail': episode['thumbnail'],
                 }
                 for episode in episodes
             ]
@@ -108,6 +107,7 @@ def get_episodes_from_playlist(playlist_id):
                 'title': item['snippet']['title'],
                 'videoId': item['snippet']['resourceId']['videoId'],
                 'description': item['snippet']['description'],
+                'thumbnail': item['snippet']['thumbnails']['default']['url'] if 'thumbnails' in item['snippet'] and 'default' in item['snippet']['thumbnails'] else None,
             }
             episodes.append(episode)
         next_page_token = playlist_items.get('nextPageToken')
@@ -145,5 +145,6 @@ def extract_titles(titles):
             modified_titles.append({
                 'title': new_title,
                 'videoId': title['videoId'],
+                'thumbnail': title['thumbnail']
             })
     return modified_titles

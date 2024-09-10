@@ -43,7 +43,7 @@
 
      <!-- Modal for Playlist Videos -->
         <div class="modal fade" id="episodesModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-          <div class="modal-dialog">
+          <div class="modal-dialog modal-lg">
             <div class="modal-content">
               <div class="modal-header" style="border-bottom-color: black;">
                 <h5 class="modal-title" id="staticBackdropLabel">{{ channel_settings.title}}</h5>
@@ -72,23 +72,51 @@
                               </div>
                           </div>
                       </div>
-
-                  <div class="row mt-4">
-                            <ul id="episodeList" class="list-group">
-                                {% for season_title, season_data in seasons.items %}
-                                        <li class="list-group-item episode-item" data-season="{{ season_title }}" style="{% if season_title == default_season_title %}display: block;{% else %}display: none;{% endif %}">
-                                        {% for episode in season_data.episodes %}
-                                            <div>
-                                                <span>{{ forloop.counter }}</span>
-                                                <p>{{ episode.title }}</p>
-                                                <span class="video-id" data-videoid="{{ episode.videoId }}" style="display:none">{{ episode.videoId }}</span>
+{#                      <div class="row mt-4">#}
+{#                          <ul id="episodeList" class="list-group">#}
+{#                            {% for season_title, season_data in seasons.items %}#}
+{#                                    <li class="list-group-item episode-item" data-season="{{ season_title }}" style="{% if season_title == default_season_title %}display: block;{% else %}display: none;{% endif %}">#}
+{#                                    {% for episode in season_data.episodes %}#}
+{#                                        <div>#}
+{#                                            <span>{{ forloop.counter }}</span>#}
+{#                                            <p>{{ episode.title }}</p>#}
+{#                                            <span class="video-id" data-videoid="{{ episode.videoId }}" style="display:none">{{ episode.videoId }}</span>#}
+{#                                        </div>#}
+{#                                    {% endfor %}#}
+{#                                </li>#}
+{#                            {% endfor %}#}
+{#                          </ul>#}
+{#                      </div>#}
+                        <div class="row mt-4" id="episodeList">
+                            {% for season_title, season_data in seasons.items %}
+                                <div class="container episode-item" data-season="{{ season_title }}" style="{% if season_title == default_season_title %}display: block;{% else %}display: none;{% endif %}">
+                                    {% for episode in season_data.episodes %}
+                                        <div class="row">
+                                            <div class="col-2 d-flex align-items-center justify-content-center">{{ forloop.counter }}</div>
+                                            <div class="col-4">
+                                                <img class="img-thumbnail" src="{{ episode.thumbnail }}" alt="">
                                             </div>
-                                        {% endfor %}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
+                                            <div class="col-6 d-flex align-items-center">{{ episode.title }}</div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
 
+{#                            <div class="container">#}
+{#                                <div class="row episode-item">#}
+{#                                    <div class="col-2 d-flex align-items-center justify-content-center">#}
+{#                                        1#}
+{#                                    </div>#}
+{#                                    <div class="col-4">#}
+{#                                        <img class="img-thumbnail" src="https://i.ytimg.com/vi/vFHIBiV65Us/sddefault.jpg" alt="">#}
+{#                                    </div>#}
+{#                                    <div class="col-6 d-flex align-items-center">#}
+{#                                        La Boda De Jorgito - No Jodas a Mario Hart#}
+{#                                    </div>#}
+{#                                </div>#}
+{##}
+{#                            </div>#}
+                        </div>
                   </div>
               </div>
               <div class="modal-footer" style="border-top-color: black;">
