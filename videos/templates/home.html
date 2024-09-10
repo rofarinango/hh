@@ -55,11 +55,11 @@
                     <div class="row embed-responsive" style="margin-right: -40px; margin-left: -40px; margin-top: -30px;">
                           <div id="player" class="embed-responsive-item"></div>
                       </div>
-                    <div class="row">
-                          <div class="col-8 d-flex align-items-center">
+                    <div class="row mt-4">
+                          <div class="col-8 d-flex align-items-center ps-4">
                               <h5 class="mb-0">Episodios</h5>
                           </div>
-                          <div class="col-4 text-end pe-0">
+                          <div class="col-4 text-end pe-4">
                               <div class="dropdown">
                                   <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                       {{ second_season_title }}
@@ -72,32 +72,19 @@
                               </div>
                           </div>
                       </div>
-{#                      <div class="row mt-4">#}
-{#                          <ul id="episodeList" class="list-group">#}
-{#                            {% for season_title, season_data in seasons.items %}#}
-{#                                    <li class="list-group-item episode-item" data-season="{{ season_title }}" style="{% if season_title == default_season_title %}display: block;{% else %}display: none;{% endif %}">#}
-{#                                    {% for episode in season_data.episodes %}#}
-{#                                        <div>#}
-{#                                            <span>{{ forloop.counter }}</span>#}
-{#                                            <p>{{ episode.title }}</p>#}
-{#                                            <span class="video-id" data-videoid="{{ episode.videoId }}" style="display:none">{{ episode.videoId }}</span>#}
-{#                                        </div>#}
-{#                                    {% endfor %}#}
-{#                                </li>#}
-{#                            {% endfor %}#}
-{#                          </ul>#}
-{#                      </div>#}
                         <div class="row mt-4" id="episodeList">
                             {% for season_title, season_data in seasons.items %}
-                                <div class="container episode-item" data-season="{{ season_title }}" style="{% if season_title == default_season_title %}display: block;{% else %}display: none;{% endif %}">
+                                <div class="container ps-5 pe-5 episode-item" data-season="{{ season_title }}" style="{% if season_title == default_season_title %}display: block;{% else %}display: none;{% endif %}">
                                     {% for episode in season_data.episodes %}
-                                        <div class="row">
-                                            <div class="col-2 d-flex align-items-center justify-content-center">{{ forloop.counter }}</div>
-                                            <div class="col-4">
-                                                <img class="img-thumbnail" src="{{ episode.thumbnail }}" alt="">
+                                        <a href="{% url 'watch_episode' episode.videoId %}" style="text-decoration: none; color: inherit;">
+                                            <div class="row episode-row" style="border-top: 0.5px solid #999999; cursor: pointer;">
+                                                <div class="col-1 d-flex align-items-center justify-content-center">{{ forloop.counter }}</div>
+                                                <div class="col-2">
+                                                    <img class="img-thumbnail" src="{{ episode.thumbnail }}" alt="thumbnail" style="border: 0 solid black; padding: 0;">
+                                                </div>
+                                                <div class="col-8 d-flex align-items-center fs-5 fw-bold">{{ episode.title }}</div>
                                             </div>
-                                            <div class="col-6 d-flex align-items-center">{{ episode.title }}</div>
-                                        </div>
+                                        </a>
                                     {% endfor %}
                                 </div>
                             {% endfor %}

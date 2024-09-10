@@ -20,4 +20,5 @@ from videos import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),
+    path('watch/<str:episode_id>/', views.watch_episode, name='watch_episode'),
 ]

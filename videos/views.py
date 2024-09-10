@@ -1,9 +1,8 @@
-from collections import OrderedDict
-
 from django.shortcuts import render
 from decouple import config
 from googleapiclient.discovery import build
 import re
+import isodate
 
 
 api_key = config('API_KEY')
@@ -67,6 +66,14 @@ def home(request):
         },
     )
 
+def watch_episode(request, episode_id):
+    return render(
+        request,
+        'videos/watch_episode.html',
+        {
+            'episode_id': episode_id,
+        }
+    )
 
 def get_seasons_titles():
     playlist_ids = {}
@@ -102,11 +109,9 @@ def get_episodes_from_playlist(playlist_id):
         ).execute()
 
         for item in playlist_items['items']:
-
             episode = {
                 'title': item['snippet']['title'],
                 'videoId': item['snippet']['resourceId']['videoId'],
-                'description': item['snippet']['description'],
                 'thumbnail': item['snippet']['thumbnails']['default']['url'] if 'thumbnails' in item['snippet'] and 'default' in item['snippet']['thumbnails'] else None,
             }
             episodes.append(episode)
@@ -148,3 +153,15 @@ def extract_titles(titles):
                 'thumbnail': title['thumbnail']
             })
     return modified_titles
+
+def get_video_total_minutes(video_id):
+    video_response = youtube.videos().list(
+        part="contentDetails",
+        id=video_id,
+    ).execute()
+
+    total_minutes = (
+        isodate.parse_duration(video_response['items'][0]['contentDetails']['duration']).total_seconds() / 60
+        if 'items' in video_response and video_response['items']
+        else 0)
+    return total_minutes

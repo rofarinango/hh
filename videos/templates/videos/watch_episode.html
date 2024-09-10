@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}
+	Watch Episode
+{% endblock %}
+{% block content %}
+    <h1>Watching Episode: {{ episode_id }}</h1>
+
+    <!-- Embed YouTube player with the video ID -->
+    <div class="video-container">
+        <iframe width="560" height="315"
+                src="https://www.youtube.com/embed/{{ episode_id }}"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen>
+        </iframe>
+</div>{% endblock %}
