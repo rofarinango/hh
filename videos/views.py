@@ -3,6 +3,7 @@ from decouple import config
 from googleapiclient.discovery import build
 import re
 import isodate
+import random
 
 
 api_key = config('API_KEY')
@@ -31,8 +32,6 @@ def home(request):
 
     formatted_seasons = get_seasons_titles()
     seasons = {}
-    first_key = next(iter(formatted_seasons))
-    first_value = formatted_seasons[first_key]
 
     # Construct seasons json, each item key represents one season, each value will contain all the episodes for that season.
     for key, value in formatted_seasons.items():
