@@ -82,7 +82,8 @@
                                                 <div class="col-2">
                                                     <img class="img-thumbnail" src="{{ episode.thumbnail }}" alt="thumbnail" style="border: 0 solid black; padding: 0;">
                                                 </div>
-                                                <div class="col-8 d-flex align-items-center fs-5 fw-bold">{{ episode.title }}</div>
+                                                <div class="col-7 d-flex align-items-center fs-7 fw-bold">{{ episode.title }}</div>
+                                                <div class="col-2 d-flex align-items-center fs-7 fw-bold">{{ episode.duration }} min</div>
                                             </div>
                                         </a>
                                     {% endfor %}
@@ -90,10 +91,6 @@
                             {% endfor %}
                         </div>
                   </div>
-              </div>
-              <div class="modal-footer" style="border-top-color: black;">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Understood</button>
               </div>
             </div>
           </div>
@@ -121,19 +118,24 @@
                 });
             }
 
-                // Extract all video IDs from the template data
-            const allVideoIds = [
+            // Extract all video IDs from the template data
+            const allVideos = [
                 {% for season_title, season_data in seasons.items %}
                     {% for episode in season_data.episodes %}
-                        "{{ episode.videoId }}",
+                        { videoId: "{{ episode.videoId }}", duration: "{{ episode.duration }}" },
                     {% endfor %}
                 {% endfor %}
             ];
-
             // Function to get a random video ID
-            function getRandomVideoId() {
-                const randomIndex = Math.floor(Math.random() * allVideoIds.length);
-                return allVideoIds[randomIndex];
+            function getRandomVideo() {
+                const randomIndex = Math.floor(Math.random() * allVideos.length);
+                return allVideos[randomIndex];
+            }
+
+             // Function to calculate a random start time within the video duration
+            function getRandomStartTime(duration) {
+                const totalDurationInSeconds = parseInt(duration) * 60;  // Convert minutes to seconds
+                return Math.floor(Math.random() * totalDurationInSeconds);
             }
 
 
@@ -143,16 +145,17 @@
                 if (player) {
                     player.destroy();  // Ensure any existing player is destroyed before creating a new one
                 }
-                let randomVideoId = getRandomVideoId();
+                const randomVideo = getRandomVideo();
+                const randomStartTime = getRandomStartTime(randomVideo.duration);
                 player = new YT.Player('player', {
                     height: '315',
                     width: '100%',
-                    videoId: randomVideoId,
+                    videoId: randomVideo.videoId,
                     playerVars: {
                         'playsinline': 1,
                         'autoplay': 1,
                         'mute': 1,
-                        'start': 530,
+                        'start': randomStartTime,
                         'controls': 0,
                         'showinfo': 0
                     },
